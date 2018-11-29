@@ -1,6 +1,6 @@
 print("Starting Lua script...")
-global = js.global
-document = global.document
+local global = js.global
+local document = global.document
 
 local function jsexceptionhandler(jsexception)
   return jsexception
@@ -78,3 +78,7 @@ function _G.content( lon )
   end
   print("LON processed.")
 end
+
+_G.global = global
+_G.document = document
+print("Initialization done.")
