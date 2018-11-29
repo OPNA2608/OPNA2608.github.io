@@ -82,3 +82,6 @@ end
 _G.global = global
 _G.document = document
 print("Initialization done.")
+
+print("Loading content.")
+dofile("content.lon")
