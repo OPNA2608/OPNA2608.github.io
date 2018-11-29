@@ -1,0 +1,158 @@
+content {
+  ["page-content"] = {
+    {
+      tag = "h1",
+      text = "This is /home/オップナー2608",
+      style = {
+        textAlign = "center",
+        textDecoration = "underline",
+      },
+    },
+    {
+      tag = "p",
+      style = {
+        textAlign = "center",
+      },
+      subnodes = {
+        {
+          tag = "sub",
+          text = "(Professional shitposter since 1999)",
+        },
+      },
+    },
+    {
+      tag = "hr",
+    },
+    {
+      tag = "br",
+    },
+    {
+      tag = "b",
+      subnodes = {
+        {
+          tag = "code",
+          text = "オップナー2608@internet:",
+          style = {
+            color = "#859900",
+          },
+        },
+        {
+          tag = "code",
+          text = "~",
+          style = {
+            color = "#268bd2",
+          }
+        },
+        {
+          tag = "br",
+        },
+        {
+          tag = "form",
+          style = {
+            display = "table",
+            width = "100%",
+          },
+          attributes = {
+            id = "shell",
+            onsubmit = (function()
+                          global.onsubmit = function()
+                            --get all important nodes
+                            local cmdline = document:getElementById("cmd")
+                            local prompt = document:getElementById("prompt")
+                            
+                            local this = cmdline.parentNode
+                            local bold = this.parentNode
+                            local page = bold.parentNode
+                            local cmd = cmdline.value
+                            cmdline.value = ""
+                            local newbold = bold:cloneNode(true)
+                            local flexcontainer = document:createElement("div")
+                            flexcontainer.style.display = "flex"
+                            flexcontainer.style.width = "100%"
+
+                            
+                            this:removeChild(cmdline)
+                            this:removeChild(prompt)
+                            local cli = document:createElement("code")
+                            cli:appendChild(document:createTextNode(cmd))
+                            local clidiv = document:createElement("div")
+                            clidiv.style.overflow = "hidden"
+                            clidiv.style.wordWrap = "break-word"
+                            clidiv.style.width = "100%"
+                            clidiv:appendChild(cli)
+
+                            local response = document:createElement("code")
+                            local responseText = ""
+                            local doneSearching = false
+                            for __dummy, possibleCommand in ipairs(global.shellCommands) do
+                              for pattern, command in pairs(possibleCommand) do
+                                if cmd:match(pattern) then
+                                  responseText = (cmd:gsub(pattern, command))
+                                  if responseText ~= "" then
+                                    doneSearching = true
+                                    break
+                                  else
+                                    responseText = ""
+                                  end
+                                end
+                              end
+                              if doneSearching then break end
+                            end
+                            response.style.wordWrap = "break-word"
+                            response:appendChild(document:createTextNode(responseText))
+                            
+                            bold:removeChild(this)
+                            prompt = document:createElement("code")
+                            prompt:appendChild(document:createTextNode("↪ "))
+                            prompt.style.color = "#268bd2"
+                            
+                            local extrabold = document:createElement("b")
+                            extrabold.style.width = "14px"
+                            extrabold:appendChild(prompt)
+                            flexcontainer:appendChild(extrabold)
+                            flexcontainer:appendChild(clidiv)
+                            page:appendChild(flexcontainer)
+                            page:appendChild(response)
+                            page:appendChild(document:createElement("br"))
+                            page:appendChild(document:createElement("br"))
+                            page:appendChild(newbold)
+                            document:getElementById("cmd"):focus()
+                            return false
+                          end
+                        end)(),
+          },
+          subnodes = {
+            {
+              tag = "code",
+              text = "↪ ",
+              style = {
+                color = "#268bd2",
+                display = "table-cell",
+                width = "14px",
+              },
+              attributes = {
+                id = "prompt",
+              }
+            },
+            {
+              tag = "input",
+              style = {
+                backgroundColor = "#ffffea",
+                border = "0px",
+                fontFamily = "monospace",
+                fontSize = "9pt",
+                padding = "0px",
+                display = "table-cell",
+                width = "100%",
+              },
+              attributes = {
+                type = "text",
+                id = "cmd",
+              },
+            },
+          }
+        },
+      },
+    },
+  },
+}
