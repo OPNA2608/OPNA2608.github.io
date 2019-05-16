@@ -1,12 +1,17 @@
-print("Starting Lua script...")
 local global = js.global
 local document = global.document
+
+if (global.luaInit == 1) then
+  error ("Aborted attempt to reinitialize page script. *What were they thinking?!*")
+end
+
+print("Starting ...")
 
 local function jsexceptionhandler(jsexception)
   return jsexception
 end
 
-local function zeroargumentLegitCall(...)
+function zeroargumentLegitCall(...)
   local spaces = select(1,...)
   local rest = select(2,...)
   if #spaces == 0 and #rest > 0 then
@@ -16,14 +21,14 @@ local function zeroargumentLegitCall(...)
   end
 end
 
+function registerLuaFunctionInJS (name, func)
+  if type (name) == "string" and type (func) == "function" then
+    global[name] = func
+    return name.."()"
+  end
+end
+
 global.shellCommands = {{
-  ["^%s*echo(%s*)(.*)$"] = function(...)
-                             if zeroargumentLegitCall(...) then
-                               return (string.rep(" ",#(select(1,...))-1) .. (select(2,...)) or "") .. "\n"
-                             else
-                               return ""
-                             end
-                           end},{
   --default
   ["^(.*)$"] = function(...)
              local line = select(1,...):match("^%s*(.-)$"):match("^(.-)%s*$")
@@ -42,7 +47,7 @@ local function nodeGenerator( lonsubstructure )
   if successCreation then
     element:appendChild(document:createTextNode(nodeText))
     for attributename, attributevalue in pairs(nodeAttributes) do
-      element:setAttribute(attributename, attributevalue)
+      element:setAttribute (attributename, type (attributevalue) == "function" and registerLuaFunctionInJS (attributevalue()) or attributevalue)
     end
     for styleelement, stylevalue in pairs(nodeStyle) do
       element.style[styleelement] = stylevalue
@@ -79,9 +84,9 @@ function _G.content( lon )
   print("LON processed.")
 end
 
-_G.global = global
-_G.document = document
+if (global.luaInit == 0) then
+  global.luaInit = 1
+end
+
 print("Initialization done.")
 
-print("Loading content.")
-dofile("content.lon")
