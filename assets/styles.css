@@ -46,6 +46,10 @@ h1 {
   text-align: center;
 }
 
+.container-centered {
+  text-align: center;
+}
+
 footer {
   background-color: #aeb1b0;
   text-align: center;
