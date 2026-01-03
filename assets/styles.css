@@ -14,7 +14,7 @@ nav > ul {
 }
 
 nav > ul > li {
-  background-color: #04AA6D;
+  background-color: #D0D0D0;
   float: left;
   border-style: ridge;
   border-color: transparent;
@@ -29,6 +29,7 @@ nav > ul > li:hover {
 }
 
 nav > ul > li > a {
+  color: inherit;
   display: block;
   text-align: center;
   padding: 14px 16px;
