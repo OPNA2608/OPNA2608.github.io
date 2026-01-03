@@ -11,10 +11,6 @@ let
       href = "/";
       text = "Home";
     }
-    {
-      href = "/invalid.html";
-      text = "test";
-    }
   ];
   navbar =
     let
