@@ -5,6 +5,17 @@
 }:
 
 let
+  sortListByPos =
+    builtins.sort
+      (
+        a: b:
+        let
+          aPos = a.pos or 1;
+          bPos = b.pos or 9999999;
+        in
+        aPos < bPos
+      );
+
   navs = [
     {
       pos = 1;
@@ -23,16 +34,7 @@ let
               </a>
             </li>
           '')
-          (
-            builtins.sort (
-              a: b:
-              let
-                aPos = a.pos or 1;
-                bPos = b.pos or 9999999;
-              in
-              aPos < bPos
-            ) navs
-          );
+          (sortListByPos navs);
     in
     ''
       <nav>
@@ -41,6 +43,58 @@ let
         </ul>
       </nav>
     '';
+
+  thingsList = [
+    {
+      pos = 1;
+      text = "I do weird stuff";
+    }
+    {
+      pos = 2;
+      text = "I like old stuff";
+    }
+    {
+      pos = 3;
+      text = "I'm not a graphical designer";
+    }
+    {
+      pos = 4;
+      text = "I'm not super serious about things";
+    }
+    {
+      pos = 5;
+      text = "Light mode rulez";
+    }
+    {
+      pos = 6;
+      text = "Fuck AIs/LLMs";
+    }
+    {
+      pos = 7;
+      text = "Fuck SEO";
+    }
+    {
+      pos = 8;
+      text = "&#x1F986; (duck)";
+    }
+  ];
+  thingsListHtml =
+    let
+      things =
+        lib.strings.concatMapStringsSep "\n"
+          (elem: "<li>${elem.text}</li>")
+          (sortListByPos thingsList);
+    in
+    ''
+      <ul>
+      ${things}
+      </ul>
+    '';
+  thingsListOpenGraph =
+    lib.strings.concatMapStringsSep "; "
+      (elem: elem.text)
+      (sortListByPos thingsList);
+
   parts =
     builtins.map
       (
@@ -50,7 +104,15 @@ let
         in
         if builtins.typeOf data == "set" then
           {
-            src = nameToPath data.filename;
+            src =
+              if data ? "transforms" then
+                writers.writeText data.filename (
+                  lib.lists.foldl
+                    (prev: entry: entry prev)
+                    (builtins.readFile (nameToPath data.filename + ".in"))
+                    data.transforms)
+              else
+                nameToPath data.filename;
           }
           // data
         else if builtins.typeOf data == "string" then
@@ -64,9 +126,12 @@ let
       [
         {
           filename = "index.html";
-          src = writers.writeText "index.html" (
-            lib.strings.replaceString "<nix-generate-nav />" navbar (builtins.readFile ./index.html.in)
-          );
+          transforms = [
+            (lib.strings.replaceString "PAGE_TITLE" "Home") # TODO make more generic
+            (lib.strings.replaceString "<nix-generate-nav />" navbar)
+            (lib.strings.replaceString "THINGS_LIST_OPENGRAPH" thingsListOpenGraph)
+            (lib.strings.replaceString "<nix-generate-things-list />" thingsListHtml)
+          ];
         }
         "assets"
       ];
@@ -86,13 +151,20 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     mkdir -p $out
 
   ''
-  + (lib.strings.concatMapStringsSep "\n" (
-    x: "cp -vr --no-preserve=all ${x.src} $out/${x.filename}"
-  ) parts)
-  + ''
 
+  + (lib.strings.concatMapStringsSep "\n" (
+    x: ''
+      cp -vr --no-preserve=all ${x.src} $out/${x.filename}
+    ''
+  ) parts)
+
+  # TODO can this be moved into transforms somehow?
+  + ''
     substituteInPlace $out/index.html \
       --replace-fail 'CURRENT_YEAR' '${builtins.head (lib.strings.splitString "-" finalAttrs.passthru.date)}'
+  ''
+
+  + ''
 
     runHook postBuild
   '';
