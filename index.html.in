@@ -31,7 +31,20 @@
 
     <footer>
       <p class="copyright-statement">Copyright CURRENT_YEAR Cosima Neidahl</p>
+
+      <!--
+        LOAD BEARING (kinda)
+
+        WAVE warns about <p> before <table> possibly being a table caption.
+        Even if the table has an ARIA label.
+        And in slightly other arrangements, it warns that the table may be a layout table
+        (*just* for visually aligning elements), which should be done via CSS instead.
+
+        This *IS* a table. And a caption for sighted users is *NOT* necessary here (IMO).
+        <hr /> here divides the copyright statement from the table, preventing the warning.
+      -->
       <hr />
+
       <table aria-label="Links to spaces where I'm present">
         <tr>
           <th>Space</th>
