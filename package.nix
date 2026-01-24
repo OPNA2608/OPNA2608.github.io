@@ -25,17 +25,17 @@ let
     let
       links = lib.strings.concatMapStringsSep "\n" (elem: ''
         <li class="nav-${lib.strings.toLower elem.text}">
-          <a href="${elem.href}">
-            ${elem.text}
-          </a>
+        <a href="${elem.href}">
+        ${elem.text}
+        </a>
         </li>
       '') (sortListByPos navs);
     in
     ''
       <nav>
-        <ul>
+      <ul>
       ${links}
-        </ul>
+      </ul>
       </nav>
     '';
 
@@ -159,6 +159,5 @@ stdenvNoCC.mkDerivation (finalAttrs: {
           }
           "assets"
         ];
-
   };
 })
