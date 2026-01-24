@@ -3,11 +3,11 @@ body {
 }
 
 a {
-  color: blue;
+  color: #000080;
 }
 
 a:visited {
-  color: blue;
+  color: #000080;
 }
 
 nav {
