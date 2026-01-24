@@ -59,6 +59,10 @@ h1 {
   text-align: center;
 }
 
+table > caption {
+  font-weight: bold;
+}
+
 footer {
   background-color: #aeb1b0;
   text-align: center;
@@ -72,4 +76,8 @@ footer > table {
 
 footer * {
   padding: 0px 0px;
+}
+
+.copyright-statement {
+  font-weight: bold;
 }
