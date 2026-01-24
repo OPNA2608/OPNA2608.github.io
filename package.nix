@@ -91,10 +91,40 @@ let
       </ul>
     '';
   thingsListOpenGraph =
-    lib.strings.concatMapStringsSep "; "
+    lib.strings.concatMapStringsSep " | "
       (elem: elem.text)
       (sortListByPos thingsList);
 
+in
+stdenvNoCC.mkDerivation (finalAttrs: {
+  pname = "website-full";
+  version = "0-unstable-${finalAttrs.passthru.date}";
+
+  srcs = builtins.map (x: x.src) finalAttrs.passthru.parts;
+
+  dontUnpack = true;
+  dontConfigure = true;
+
+  buildPhase = ''
+    runHook preBuild
+
+    mkdir -p $out
+
+  ''
+
+  + (lib.strings.concatMapStringsSep "\n" (
+    x: ''
+      cp -vr --no-preserve=all ${x.src} $out/${x.filename}
+    ''
+  ) finalAttrs.passthru.parts)
+
+  + ''
+
+    runHook postBuild
+  '';
+
+  passthru = {
+    date = "YYYY-MM-DD";
   parts =
     builtins.map
       (
@@ -131,45 +161,11 @@ let
             (lib.strings.replaceString "<nix-generate-nav />" navbar)
             (lib.strings.replaceString "THINGS_LIST_OPENGRAPH" thingsListOpenGraph)
             (lib.strings.replaceString "<nix-generate-things-list />" thingsListHtml)
+            (lib.strings.replaceString "CURRENT_YEAR" (builtins.head (lib.strings.splitString "-" finalAttrs.passthru.date)))
           ];
         }
         "assets"
       ];
-in
-stdenvNoCC.mkDerivation (finalAttrs: {
-  pname = "website-full";
-  version = "0-unstable-${finalAttrs.passthru.date}";
 
-  srcs = builtins.map (x: x.src) parts;
-
-  dontUnpack = true;
-  dontConfigure = true;
-
-  buildPhase = ''
-    runHook preBuild
-
-    mkdir -p $out
-
-  ''
-
-  + (lib.strings.concatMapStringsSep "\n" (
-    x: ''
-      cp -vr --no-preserve=all ${x.src} $out/${x.filename}
-    ''
-  ) parts)
-
-  # TODO can this be moved into transforms somehow?
-  + ''
-    substituteInPlace $out/index.html \
-      --replace-fail 'CURRENT_YEAR' '${builtins.head (lib.strings.splitString "-" finalAttrs.passthru.date)}'
-  ''
-
-  + ''
-
-    runHook postBuild
-  '';
-
-  passthru = {
-    date = "YYYY-MM-DD";
   };
 })
