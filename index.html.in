@@ -31,6 +31,7 @@
 
     <footer>
       <p class="copyright-statement">Copyright CURRENT_YEAR Cosima Neidahl</p>
+      <hr />
       <table aria-label="Links to spaces where I'm present">
         <tr>
           <th>Space</th>
