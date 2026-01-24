@@ -5,16 +5,14 @@
 }:
 
 let
-  sortListByPos =
-    builtins.sort
-      (
-        a: b:
-        let
-          aPos = a.pos or 1;
-          bPos = b.pos or 9999999;
-        in
-        aPos < bPos
-      );
+  sortListByPos = builtins.sort (
+    a: b:
+    let
+      aPos = a.pos or 1;
+      bPos = b.pos or 9999999;
+    in
+    aPos < bPos
+  );
 
   navs = [
     {
@@ -25,16 +23,13 @@ let
   ];
   navbar =
     let
-      links =
-        lib.strings.concatMapStringsSep "\n"
-          (elem: ''
-            <li class="nav-${lib.strings.toLower elem.text}">
-              <a href="${elem.href}">
-                ${elem.text}
-              </a>
-            </li>
-          '')
-          (sortListByPos navs);
+      links = lib.strings.concatMapStringsSep "\n" (elem: ''
+        <li class="nav-${lib.strings.toLower elem.text}">
+          <a href="${elem.href}">
+            ${elem.text}
+          </a>
+        </li>
+      '') (sortListByPos navs);
     in
     ''
       <nav>
@@ -80,20 +75,18 @@ let
   ];
   thingsListHtml =
     let
-      things =
-        lib.strings.concatMapStringsSep "\n"
-          (elem: "<li>${elem.text}</li>")
-          (sortListByPos thingsList);
+      things = lib.strings.concatMapStringsSep "\n" (elem: "<li>${elem.text}</li>") (
+        sortListByPos thingsList
+      );
     in
     ''
       <ul>
       ${things}
       </ul>
     '';
-  thingsListOpenGraph =
-    lib.strings.concatMapStringsSep " | "
-      (elem: elem.text)
-      (sortListByPos thingsList);
+  thingsListOpenGraph = lib.strings.concatMapStringsSep " | " (elem: elem.text) (
+    sortListByPos thingsList
+  );
 
 in
 stdenvNoCC.mkDerivation (finalAttrs: {
@@ -112,11 +105,9 @@ stdenvNoCC.mkDerivation (finalAttrs: {
 
   ''
 
-  + (lib.strings.concatMapStringsSep "\n" (
-    x: ''
-      cp -vr --no-preserve=all ${x.src} $out/${x.filename}
-    ''
-  ) finalAttrs.passthru.parts)
+  + (lib.strings.concatMapStringsSep "\n" (x: ''
+    cp -vr --no-preserve=all ${x.src} $out/${x.filename}
+  '') finalAttrs.passthru.parts)
 
   + ''
 
@@ -125,47 +116,49 @@ stdenvNoCC.mkDerivation (finalAttrs: {
 
   passthru = {
     date = "YYYY-MM-DD";
-  parts =
-    builtins.map
-      (
-        data:
-        let
-          nameToPath = lib.path.append ./.;
-        in
-        if builtins.typeOf data == "set" then
+    parts =
+      builtins.map
+        (
+          data:
+          let
+            nameToPath = lib.path.append ./.;
+          in
+          if builtins.typeOf data == "set" then
+            {
+              src =
+                if data ? "transforms" then
+                  writers.writeText data.filename (
+                    lib.lists.foldl (prev: entry: entry prev) (builtins.readFile (
+                      nameToPath data.filename + ".in"
+                    )) data.transforms
+                  )
+                else
+                  nameToPath data.filename;
+            }
+            // data
+          else if builtins.typeOf data == "string" then
+            {
+              filename = data;
+              src = nameToPath data;
+            }
+          else
+            throw "Invalid entry in parts: ${builtins.toString data} (${builtins.typeOf data})"
+        )
+        [
           {
-            src =
-              if data ? "transforms" then
-                writers.writeText data.filename (
-                  lib.lists.foldl
-                    (prev: entry: entry prev)
-                    (builtins.readFile (nameToPath data.filename + ".in"))
-                    data.transforms)
-              else
-                nameToPath data.filename;
+            filename = "index.html";
+            transforms = [
+              (lib.strings.replaceString "PAGE_TITLE" "Home") # TODO make more generic
+              (lib.strings.replaceString "<nix-generate-nav />" navbar)
+              (lib.strings.replaceString "THINGS_LIST_OPENGRAPH" thingsListOpenGraph)
+              (lib.strings.replaceString "<nix-generate-things-list />" thingsListHtml)
+              (lib.strings.replaceString "CURRENT_YEAR" (
+                builtins.head (lib.strings.splitString "-" finalAttrs.passthru.date)
+              ))
+            ];
           }
-          // data
-        else if builtins.typeOf data == "string" then
-          {
-            filename = data;
-            src = nameToPath data;
-          }
-        else
-          throw "Invalid entry in parts: ${builtins.toString data} (${builtins.typeOf data})"
-      )
-      [
-        {
-          filename = "index.html";
-          transforms = [
-            (lib.strings.replaceString "PAGE_TITLE" "Home") # TODO make more generic
-            (lib.strings.replaceString "<nix-generate-nav />" navbar)
-            (lib.strings.replaceString "THINGS_LIST_OPENGRAPH" thingsListOpenGraph)
-            (lib.strings.replaceString "<nix-generate-things-list />" thingsListHtml)
-            (lib.strings.replaceString "CURRENT_YEAR" (builtins.head (lib.strings.splitString "-" finalAttrs.passthru.date)))
-          ];
-        }
-        "assets"
-      ];
+          "assets"
+        ];
 
   };
 })
