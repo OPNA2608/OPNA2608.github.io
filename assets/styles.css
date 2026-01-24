@@ -2,6 +2,14 @@ body {
   background-image: url("bg.gif");
 }
 
+a {
+  color: blue;
+}
+
+a:visited {
+  color: blue;
+}
+
 nav {
   background-color: #aeb1b0;
 }
