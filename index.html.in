@@ -30,8 +30,12 @@
 <nix-generate-things-list />
 
     <footer>
-      <table>
-        <caption>Socials</caption>
+      <p class="copyright-statement">Copyright CURRENT_YEAR Cosima Neidahl</p>
+      <table aria-label="Links to spaces where I'm present">
+        <tr>
+          <th>Space</th>
+          <th>Username</th>
+        </tr>
         <tr>
           <td><img src="assets/logo_mastodon.png" alt="Mastodon logo" /></td>
           <td><a rel="me" href="https://tech.lgbt/@Puna">@Puna@tech.lgbt</a></td>
@@ -41,8 +45,6 @@
           <td><a href="https://github.com/OPNA2608">@OPNA2608</a></td>
         </tr>
       </table>
-      <hr />
-      <p class="copyright-statement">Copyright CURRENT_YEAR Cosima Neidahl</p>
     </footer>
   </body>
 </html>
