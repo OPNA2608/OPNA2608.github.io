@@ -31,7 +31,20 @@
 
     <footer>
       <p>Copyright CURRENT_YEAR Cosima Neidahl</p>
-      <a rel="me" href="https://tech.lgbt/@Puna">@Puna@tech.lgbt</a>
+      <table>
+        <tr>
+          <th>Site</th>
+          <th>Username</th>
+        </tr>
+        <tr>
+          <td><img src="assets/logo_mastodon.png" alt="Mastodon logo" /></td>
+          <td><a rel="me" href="https://tech.lgbt/@Puna">@Puna@tech.lgbt</a></td>
+        </tr>
+        <tr>
+          <td><img src="assets/logo_github.png" alt="GitHub logo" /></td>
+          <td><a href="https://github.com/OPNA2608">@OPNA2608</a></td>
+        </tr>
+      </table>
     </footer>
   </body>
 </html>
