@@ -147,7 +147,7 @@ let
     + lib.optionalString hasCreditsToShow ''
       <div id="banners-credits">
       ${credits}
-      </ul>
+      </div>
     '';
 
 in
