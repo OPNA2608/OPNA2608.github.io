@@ -59,6 +59,15 @@ h1 {
   text-align: center;
 }
 
+#banners {
+  text-align: center;
+}
+
+#banners-credits {
+  text-align: center;
+  font-size: smaller;
+}
+
 footer {
   background-color: #aeb1b0;
   text-align: center;

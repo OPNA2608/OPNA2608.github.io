@@ -88,6 +88,68 @@ let
     sortListByPos thingsList
   );
 
+  bannersList = [
+    {
+      pos = 1;
+      file = "banners_estrogen.gif";
+      description = "banner labeled \"powered by estrogen\", with a spinning estrogen pill";
+      credits = {
+        name = "Alyx Wijers";
+        links = {
+          homepage = "https://alyx.sh/";
+          source = "https://x.com/npc_alyx/status/1522679980127227905";
+        };
+      };
+    }
+  ];
+  bannersListHtml =
+    let
+      inherit (lib.strings) escapeXML;
+      banners = lib.strings.concatMapStringsSep "\n" (
+        elem:
+        let
+          hasLink = elem ? link;
+        in
+        ''
+          <${if hasLink then "a href=\"${elem.link}\"" else "div"}>
+            <img
+              width="88"
+              height="31"
+              src="assets/${elem.file}"
+              alt="${escapeXML elem.description}"
+            />
+          </${if hasLink then "a" else "div"}>
+        ''
+      ) (sortListByPos bannersList);
+      bannersWithCredits = lib.lists.filter (elem: elem ? credits) bannersList;
+      hasCreditsToShow = lib.lists.length bannersWithCredits > 0;
+      credits = lib.strings.concatMapStringsSep "\n" (
+        elem:
+        let
+          linksAsHtml = lib.strings.concatStringsSep ", " (
+            lib.attrsets.mapAttrsToList (
+              linkName: linkUrl: "<a href=\"${escapeXML linkUrl}\">${escapeXML linkName}</a>"
+            ) elem.credits.links
+          );
+        in
+        ''
+          <p>
+            ${escapeXML elem.file} by ${escapeXML elem.credits.name}: ${linksAsHtml}
+          </p>
+        ''
+      ) bannersWithCredits;
+    in
+    ''
+      <div id="banners">
+      ${banners}
+      </div>
+    ''
+    + lib.optionalString hasCreditsToShow ''
+      <div id="banners-credits">
+      ${credits}
+      </ul>
+    '';
+
 in
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "website-full";
@@ -152,6 +214,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
               (lib.strings.replaceString "<nix-generate-nav />" navbar)
               (lib.strings.replaceString "THINGS_LIST_OPENGRAPH" thingsListOpenGraph)
               (lib.strings.replaceString "<nix-generate-things-list />" thingsListHtml)
+              (lib.strings.replaceString "<nix-generate-banners />" bannersListHtml)
               (lib.strings.replaceString "CURRENT_YEAR" (
                 builtins.head (lib.strings.splitString "-" finalAttrs.passthru.date)
               ))

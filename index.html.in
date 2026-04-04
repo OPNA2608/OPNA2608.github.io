@@ -29,6 +29,8 @@
 
 <nix-generate-things-list />
 
+<nix-generate-banners />
+
     <footer>
       <p class="copyright-statement">Copyright CURRENT_YEAR Cosima Neidahl</p>
 
