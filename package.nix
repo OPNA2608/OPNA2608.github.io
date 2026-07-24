@@ -101,6 +101,20 @@ let
         };
       };
     }
+    {
+      pos = 2;
+      file = "banners_fuckaieverything.gif";
+      description = ''
+        banner with the text "AI" crossed out, with text cycling next to it saying
+        "FUCK AI [ART, WRITING, MUSIC, CHAT, CODE]"
+      '';
+      credits = {
+        name = "lumi";
+        links = {
+          source = "https://snug.moe/notes/ap1jzza3y7r8mu45";
+        };
+      };
+    }
   ];
   bannersListHtml =
     let
